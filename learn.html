@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildGenius - Gamified Learning</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS will be placed here */
+    :root {
+      --primary: #7f5af0;
+      --primary-dark: #6a4dd4;
+      --secondary: #2cb67d;
+      --dark-bg: #16161a;
+      --card-bg: #242629;
+      --header-bg: #0d0a2e;
+      --section-bg: #132a50;
+      --text-light: #fffffe;
+      --text-muted: #94a1b2;
+      --success: #2cb67d;
+      --warning: #ff9e3b;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--dark-bg);
+      color: var(--text-light);
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      background-color: #1a1a1e;
+      padding: 2rem 1rem;
+      border-right: 1px solid #2e2e33;
+    }
+
+    /* User Profile Styles */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background-color: #242629;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      margin-right: 1rem;
+      border: 3px solid var(--primary);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .level-badge {
+      position: absolute;
+      bottom: -8px;
+      right: -8px;
+      background-color: var(--warning);
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      border: 2px solid var(--dark-bg);
+    }
+
+    .user-info {
+      flex-grow: 1;
+    }
+
+    .username {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .points {
+      font-size: 0.9rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .points::before {
+      content: '✦';
+      margin-right: 0.3rem;
+      color: var(--warning);
+    }
+
+    /* Points Animation */
+    @keyframes pointsPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .points-update {
+      animation: pointsPop 0.5s ease;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      padding-left: 1rem;
+    }
+
+    .course-menu {
+      margin-top: 2rem;
+    }
+
+    .menu-header {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      padding-left: 1rem;
+    }
+
+    .course-menu ul {
+      list-style: none;
+    }
+
+    .course-menu li {
+      padding: 0.8rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .course-menu li:hover {
+      background-color: #2a2a2e;
+    }
+
+    .course-menu li.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .course-menu li i {
+      margin-right: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .course-menu li span {
+      flex-grow: 1;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background-color: #2e2e33;
+      border-radius: 2px;
+      margin-top: 0.5rem;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--success);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    /* Main Content Styles */
+    .learning-interface {
+      flex-grow: 1;
+      padding: 2rem;
+      background-color: var(--dark-bg);
+    }
+
+    .course-path {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .path-line {
+      position: absolute;
+      top: 50%;
+      left: 2rem;
+      right: 2rem;
+      height: 4px;
+      background-color: #3e3e44;
+      z-index: 1;
+    }
+
+    .milestones {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+
+    .milestone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .stone {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--card-bg);
+      border: 4px solid #3e3e44;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .stone::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #3e3e44;
+    }
+
+    .milestone.completed .stone {
+      border-color: var(--success);
+    }
+
+    .milestone.completed .stone::before {
+      background-color: var(--success);
+    }
+
+    .milestone.current .stone {
+      border-color: var(--primary);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 8px rgba(127, 90, 240, 0.2);
+    }
+
+    .milestone.current .stone::before {
+      background-color: var(--primary);
+    }
+
+    .milestone.current .jumping {
+      animation: stoneJump 1s infinite alternate;
+    }
+
+    .milestone .locked {
+      border-color: #3e3e44;
+    }
+
+    .milestone .locked::before {
+      background-color: #3e3e44;
+    }
+
+    .milestone .locked::after {
+      content: '\f023';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      color: var(--text-muted);
+      position: absolute;
+      font-size: 0.8rem;
+    }
+
+    .milestone span {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .milestone.completed span {
+      color: var(--text-light);
+    }
+
+    @keyframes stoneJump {
+      0% { transform: translateY(0) scale(1.1); }
+      100% { transform: translateY(-15px) scale(1.1); }
+    }
+
+    /* Lesson Container */
+    .lesson-container {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .video-player {
+      flex: 2;
+    }
+
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      background-color: #000;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .video-controls button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .video-controls button:hover {
+      background-color: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    .lesson-details {
+      flex: 1;
+    }
+
+    .lesson-details h2 {
+      margin-bottom: 1rem;
+      color: var(--text-light);
+    }
+
+    .xp-bar {
+      height: 8px;
+      background-color: #2e2e33;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .xp-progress {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .xp-bar span {
+      position: absolute;
+      right: 0;
+      top: -25px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .lesson-details p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .actions button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-complete {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-complete:hover {
+      background-color: #25a56a;
+      transform: translateY(-2px);
+    }
+
+    .btn-quiz {
+      background-color: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary) !important;
+    }
+
+    .btn-quiz:hover {
+      background-color: rgba(127, 90, 240, 0.1);
+    }
+
+    /* Celebration Modal */
+    .celebration-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .celebration-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .celebration-content {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 3rem;
+      text-align: center;
+      max-width: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: var(--primary);
+      opacity: 0;
+    }
+
+    .confetti:nth-child(1) {
+      top: -20px;
+      left: 20%;
+      animation: confettiFall 3s ease-in-out infinite;
+      background-color: #7f5af0;
+    }
+
+    .confetti:nth-child(2) {
+      top: -20px;
+      left: 50%;
+      animation: confettiFall 3s ease-in-out 0.5s infinite;
+      background-color: #2cb67d;
+    }
+
+    .confetti:nth-child(3) {
+      top: -20px;
+      left: 80%;
+      animation: confettiFall 3s ease-in-out 1s infinite;
+      background-color: #ff9e3b;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(500px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .celebration-content h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+
+    .reward {
+      margin: 2rem 0;
+    }
+
+    .trophy {
+      font-size: 4rem;
+      color: var(--warning);
+      margin-bottom: 1rem;
+      animation: trophyBounce 0.5s ease infinite alternate;
+    }
+
+    @keyframes trophyBounce {
+      to { transform: translateY(-10px); }
+    }
+
+    .xp-reward {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .progress-update {
+      margin: 2rem 0;
+    }
+
+    .stone-jump-animation {
+      position: relative;
+      height: 100px;
+      margin-bottom: 1rem;
+    }
+
+    .stone-jump-animation .stone {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      animation: stoneMove 2s ease forwards;
+    }
+
+    .stone-jump-animation .trail {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 4px;
+      background-color: var(--primary);
+      height: 0;
+      animation: trailGrow 2s ease forwards;
+    }
+
+    @keyframes stoneMove {
+      0% { bottom: 0; }
+      50% { bottom: 100px; }
+      100% { bottom: 0; }
+    }
+
+    @keyframes trailGrow {
+      0% { height: 0; }
+      50% { height: 100px; }
+      100% { height: 0; }
+    }
+
+    .btn-continue {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-continue:hover {
+      background-color: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* Course Complete Modal */
+    .course-complete-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .course-complete-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .complete-content {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 3rem;
+      text-align: center;
+      max-width: 600px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .firework {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px 5px;
+      animation: fireworkExplode 2s ease-out infinite;
+      opacity: 0;
+    }
+
+    .firework:nth-child(1) {
+      top: 20%;
+      left: 20%;
+      animation-delay: 0.5s;
+      color: var(--gold);
+    }
+
+    .firework:nth-child(2) {
+      top: 30%;
+      right: 25%;
+      animation-delay: 1s;
+      color: var(--silver);
+    }
+
+    .firework:nth-child(3) {
+      bottom: 20%;
+      left: 30%;
+      animation-delay: 1.5s;
+      color: var(--bronze);
+    }
+
+    @keyframes fireworkExplode {
+      0% {
+        transform: translate(0, 0);
+        width: 5px;
+        height: 5px;
+        opacity: 1;
+      }
+      50% {
+        width: 2px;
+        height: 2px;
+        opacity: 1;
+      }
+      100% {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+      }
+    }
+
+    .complete-content h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .completion-message {
+      margin: 2rem 0;
+    }
+
+    .completion-message p {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--text-light);
+    }
+
+    .trophy-case {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .trophy-case i {
+      font-size: 3rem;
+      animation: trophyFloat 3s ease-in-out infinite;
+    }
+
+    .trophy-case .gold {
+      color: var(--gold);
+      animation-delay: 0s;
+    }
+
+    .trophy-case .silver {
+      color: var(--silver);
+      animation-delay: 0.5s;
+    }
+
+    .trophy-case .bronze {
+      color: var(--bronze);
+      animation-delay: 1s;
+    }
+
+    @keyframes trophyFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .btn-build-projects {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 1.2rem 2.5rem;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(127, 90, 240, 0.4);
+    }
+
+    .btn-build-projects:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(127, 90, 240, 0.6);
+    }
+
+    /* Quiz Modal */
+    .quiz-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .quiz-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .quiz-content {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .quiz-content h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .quiz-progress {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .quiz-question h3 {
+      margin-bottom: 1.5rem;
+      color: var(--text-light);
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background-color: #2e2e33;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-option:hover {
+      background-color: #3a3a40;
+    }
+
+    .quiz-option input {
+      margin-right: 1rem;
+    }
+
+    .quiz-feedback {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .quiz-feedback.correct {
+      background-color: rgba(44, 182, 125, 0.2);
+      color: var(--success);
+      display: block;
+    }
+
+    .quiz-feedback.incorrect {
+      background-color: rgba(255, 85, 85, 0.2);
+      color: #ff5555;
+      display: block;
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .quiz-actions button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-quiz-submit {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-quiz-submit:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-quiz-next {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .btn-quiz-next:hover {
+      background-color: #25a56a;
+    }
+
+    /* Quiz Requirement Indicator */
+    .quiz-required {
+      position: relative;
+    }
+
+    .quiz-required::after {
+      content: 'Quiz Required';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: var(--warning);
+      color: var(--dark-bg);
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .lesson-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 220px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        padding: 1rem;
+      }
+      
+      .course-path {
+        padding: 1rem;
+      }
+      
+      .milestone span {
+        font-size: 0.7rem;
+      }
+
+      .quiz-content {
+        padding: 1.5rem;
+      }
+
+      .quiz-option {
+        padding: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <!-- User Profile Section -->
+      <div class="user-profile">
+        <div class="avatar" id="user-avatar">
+          <img src="https://i.imgur.com/JqYeJYt.png" alt="Avatar">
+          <div class="level-badge">Lv.1</div>
+        </div>
+        <div class="user-info">
+          <div class="username">Coder</div>
+          <div class="points" id="total-points">1,250 XP</div>
+        </div>
+      </div>
+
+      <div class="logo">BuildGenius</div>
+      <nav class="course-menu">
+        <div class="menu-header">Your Courses</div>
+        <ul>
+          <li class="active" data-course="java">
+            <i class="fab fa-java"></i>
+            <span>Java Developer</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 20%"></div>
+            </div>
+          </li>
+          <li data-course="python">
+            <i class="fab fa-python"></i>
+            <span>Python Pro</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 5%"></div>
+            </div>
+          </li>
+          <li data-course="cybersecurity">
+            <i class="fas fa-shield-alt"></i>
+            <span>Cyber Security</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 0%"></div>
+            </div>
+          </li>
+          <li data-course="design">
+            <i class="fas fa-paint-brush"></i>
+            <span>UI/UX Design</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 10%"></div>
+            </div>
+          </li>
+          <li data-course="ml">
+            <i class="fas fa-robot"></i>
+            <span>Machine Learning</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 0%"></div>
+            </div>
+          </li>
+          <li data-course="webdev">
+            <i class="fas fa-code"></i>
+            <span>Web Development</span>
+            <div class="progress-bar">
+              <div class="progress" style="width: 35%"></div>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="learning-interface">
+      <!-- Course Path Visualization -->
+      <div class="course-path">
+        <div class="path-line"></div>
+        <div class="milestones">
+          <div class="milestone completed" data-lesson="1">
+            <div class="stone"></div>
+            <span>Java Basics</span>
+          </div>
+          <div class="milestone completed" data-lesson="2">
+            <div class="stone"></div>
+            <span>OOP Concepts</span>
+          </div>
+          <div class="milestone current" data-lesson="3">
+            <div class="stone jumping"></div>
+            <span>Spring Framework</span>
+          </div>
+          <div class="milestone" data-lesson="4">
+            <div class="stone locked"></div>
+            <span>Spring Boot</span>
+          </div>
+          <div class="milestone" data-lesson="5">
+            <div class="stone locked"></div>
+            <span>Final Project</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lesson Content -->
+      <div class="lesson-container">
+        <div class="video-player">
+          <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+          </div>
+          <div class="video-controls">
+            <button class="btn-rewind"><i class="fas fa-backward"></i></button>
+            <button class="btn-play"><i class="fas fa-play"></i></button>
+            <button class="btn-forward"><i class="fas fa-forward"></i></button>
+          </div>
+        </div>
+
+        <div class="lesson-details">
+          <h2>Spring Framework Fundamentals</h2>
+          <div class="xp-bar">
+            <div class="xp-progress" style="width: 65%"></div>
+            <span>65/100 XP</span>
+          </div>
+          <p>Learn how to build enterprise applications using Spring Framework's core features.</p>
+          
+          <div class="actions">
+            <button class="btn-complete" id="complete-btn">Mark as Complete</button>
+            <button class="btn-quiz quiz-required" id="quiz-btn">Take Quiz</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Celebration Modal -->
+      <div class="celebration-modal">
+        <div class="celebration-content">
+          <div class="confetti"></div>
+          <div class="confetti"></div>
+          <div class="confetti"></div>
+          <h2>Level Complete! 🎉</h2>
+          <div class="reward">
+            <div class="trophy"><i class="fas fa-trophy"></i></div>
+            <p>You earned <span class="xp-reward">+50 XP</span></p>
+          </div>
+          <div class="progress-update">
+            <div class="stone-jump-animation">
+              <div class="stone"></div>
+              <div class="trail"></div>
+            </div>
+            <p>Progressing to next level...</p>
+          </div>
+          <button class="btn-continue">Continue Learning</button>
+        </div>
+      </div>
+
+      <!-- Course Complete Modal -->
+      <div class="course-complete-modal">
+        <div class="complete-content">
+          <div class="firework"></div>
+          <div class="firework"></div>
+          <div class="firework"></div>
+          <h1>Unit Mastered! 🎊</h1>
+          <div class="completion-message">
+            <p>You've completed this unit!!</p>
+            <p>Congrats!! Let's build some projects to apply what you've learned!</p>
+          </div>
+          <div class="trophy-case">
+            <i class="fas fa-trophy gold"></i>
+            <i class="fas fa-medal silver"></i>
+            <i class="fas fa-star bronze"></i>
+          </div>
+          <button class="btn-build-projects">Start Building Projects</button>
+        </div>
+      </div>
+
+      <!-- Quiz Modal -->
+      <div class="quiz-modal">
+        <div class="quiz-content">
+          <h2>Quick Quiz</h2>
+          <div class="quiz-progress">Question <span id="current-question">1</span>/5</div>
+          
+          <div class="quiz-question">
+            <h3 id="question-text">What is the main purpose of Spring Framework?</h3>
+            <div class="quiz-options">
+              <label class="quiz-option">
+                <input type="radio" name="quiz" value="1">
+                <span>To create desktop applications</span>
+              </label>
+              <label class="quiz-option">
+                <input type="radio" name="quiz" value="2">
+                <span>To simplify enterprise Java development</span>
+              </label>
+              <label class="quiz-option">
+                <input type="radio" name="quiz" value="3">
+                <span>To replace Java programming language</span>
+              </label>
+              <label class="quiz-option">
+                <input type="radio" name="quiz" value="4">
+                <span>To build mobile applications</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="quiz-feedback" id="quiz-feedback"></div>
+          
+          <div class="quiz-actions">
+            <button class="btn-quiz-submit" disabled>Submit Answer</button>
+            <button class="btn-quiz-next" style="display: none;">Next Question</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements
+      const courseMenuItems = document.querySelectorAll('.course-menu li');
+      const milestones = document.querySelectorAll('.milestone');
+      const btnComplete = document.getElementById('complete-btn');
+      const btnQuiz = document.getElementById('quiz-btn');
+      const celebrationModal = document.querySelector('.celebration-modal');
+      const btnContinue = document.querySelector('.btn-continue');
+      const courseCompleteModal = document.querySelector('.course-complete-modal');
+      const btnBuildProjects = document.querySelector('.btn-build-projects');
+      const quizModal = document.querySelector('.quiz-modal');
+      const quizOptions = document.querySelectorAll('.quiz-option input');
+      const btnQuizSubmit = document.querySelector('.btn-quiz-submit');
+      const btnQuizNext = document.querySelector('.btn-quiz-next');
+      const quizFeedback = document.getElementById('quiz-feedback');
+      const currentQuestionElement = document.getElementById('current-question');
+      const questionTextElement = document.getElementById('question-text');
+      const videoControls = document.querySelectorAll('.video-controls button');
+      const totalPointsElement = document.getElementById('total-points');
+      const userAvatar = document.getElementById('user-avatar');
+
+      // Course Data
+      const courses = {
+        java: {
+          progress: 20,
+          lessons: 5,
+          completed: 2,
+          points: 400,
+          quizTaken: false,
+          quizPassed: false,
+          currentLesson: 3,
+          lessonQuizzes: [true, true, false, false, false] // Which lessons require quizzes
+        },
+        python: {
+          progress: 5,
+          lessons: 6,
+          completed: 0,
+          points: 100,
+          quizTaken: false,
+          quizPassed: false,
+          currentLesson: 1,
+          lessonQuizzes: [true, true, true, true, false, false]
+        },
+        cybersecurity: {
+          progress: 0,
+          lessons: 8,
+          completed: 0,
+          points: 0,
+          quizTaken: false,
+          quizPassed: false,
+          currentLesson: 1,
+          lessonQuizzes: [true, true, true, true, true, false, false, false]
+        },
+        design: {
+          progress: 10,
+          lessons: 7,
+          completed: 1,
+          points: 200,
+          quizTaken: false,
+          quizPassed: false,
+          currentLesson: 2,
+          lessonQuizzes: [true, true, true, true, false, false, false]
+        },
+        ml: {
+          progress: 0,
+          lessons: 6,
+          completed: 0,
+          points: 0,
+          quizTaken: false,
+          quizPassed: false,
+          currentLesson: 1,
+          lessonQuizzes: [true, true, true, true, false, false]
+        },
+        webdev: {
+          progress: 35,
+          lessons: 10,
+          completed: 3,
+          points: 550,
+          quizTaken: false,
+          quizPassed: false,
+          currentLesson: 4,
+          lessonQuizzes: [true, true, true, true, true, false, false, false, false, false]
+        }
+      };
+
+      // Quiz Data for all courses
+      const quizzes = {
+        java: [
+          {
+            question: "What is the main purpose of Spring Framework?",
+            options: [
+              "To create desktop applications",
+              "To simplify enterprise Java development",
+              "To replace Java programming language",
+              "To build mobile applications"
+            ],
+            answer: 2
+          },
+          {
+            question: "Which of these is NOT a Spring module?",
+            options: [
+              "Spring MVC",
+              "Spring Boot",
+              "Spring Data",
+              "Spring UI"
+            ],
+            answer: 4
+          },
+          {
+            question: "What is dependency injection?",
+            options: [
+              "A design pattern for creating objects",
+              "A way to inject dependencies into a class",
+              "A method for database access",
+              "A security feature"
+            ],
+            answer: 2
+          },
+          {
+            question: "What does IoC stand for in Spring?",
+            options: [
+              "Integration of Components",
+              "Inversion of Control",
+              "Input of Configuration",
+              "Interface of Classes"
+            ],
+            answer: 2
+          },
+          {
+            question: "Which annotation is used to mark a class as Spring component?",
+            options: [
+              "@Bean",
+              "@Service",
+              "@Component",
+              "@Repository"
+            ],
+            answer: 3
+          }
+        ],
+        python: [
+          {
+            question: "What is Python's primary design philosophy?",
+            options: [
+              "Readability counts",
+              "Performance first",
+              "Compact syntax",
+              "Strict typing"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which of these is NOT a Python data structure?",
+            options: [
+              "List",
+              "Tuple",
+              "Array",
+              "Dictionary"
+            ],
+            answer: 3
+          },
+          {
+            question: "What does PEP 8 refer to?",
+            options: [
+              "Python Enhancement Proposal for style guide",
+              "Python version 8",
+              "A Python package",
+              "A Python framework"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which keyword is used to define a function in Python?",
+            options: [
+              "func",
+              "def",
+              "function",
+              "fn"
+            ],
+            answer: 2
+          },
+          {
+            question: "What is the output of 'print(3 * 'abc')'?",
+            options: [
+              "abcabcabc",
+              "3abc",
+              "Error",
+              "abc abc abc"
+            ],
+            answer: 1
+          }
+        ],
+        cybersecurity: [
+          {
+            question: "What is the most common type of cyber attack?",
+            options: [
+              "Phishing",
+              "DDoS",
+              "SQL Injection",
+              "Man-in-the-middle"
+            ],
+            answer: 1
+          },
+          {
+            question: "What does VPN stand for?",
+            options: [
+              "Virtual Private Network",
+              "Verified Private Node",
+              "Virtual Protected Network",
+              "Verified Public Network"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which of these is NOT a hashing algorithm?",
+            options: [
+              "SHA-256",
+              "MD5",
+              "AES",
+              "bcrypt"
+            ],
+            answer: 3
+          },
+          {
+            question: "What is two-factor authentication?",
+            options: [
+              "Using two passwords",
+              "Verifying identity with two different methods",
+              "Logging in from two devices",
+              "Using two security questions"
+            ],
+            answer: 2
+          },
+          {
+            question: "Which protocol provides secure communication over a network?",
+            options: [
+              "HTTP",
+              "FTP",
+              "HTTPS",
+              "SMTP"
+            ],
+            answer: 3
+          }
+        ],
+        design: [
+          {
+            question: "What does UX stand for?",
+            options: [
+              "User Experience",
+              "User Example",
+              "User Extension",
+              "User Experiment"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which of these is NOT a design principle?",
+            options: [
+              "Contrast",
+              "Repetition",
+              "Alignment",
+              "Complication"
+            ],
+            answer: 4
+          },
+          {
+            question: "What is the purpose of wireframing?",
+            options: [
+              "To create final designs",
+              "To plan layout and structure",
+              "To choose color schemes",
+              "To write content"
+            ],
+            answer: 2
+          },
+          {
+            question: "Which tool is primarily used for UI design?",
+            options: [
+              "Figma",
+              "Excel",
+              "Word",
+              "PowerPoint"
+            ],
+            answer: 1
+          },
+          {
+            question: "What is the golden ratio in design?",
+            options: [
+              "1:1.618",
+              "1:2",
+              "2:3",
+              "3:4"
+            ],
+            answer: 1
+          }
+        ],
+        ml: [
+          {
+            question: "What is machine learning?",
+            options: [
+              "Programming computers to learn from data",
+              "Teaching computers manually",
+              "Creating hardware that learns",
+              "Writing algorithms without data"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which of these is NOT a machine learning type?",
+            options: [
+              "Supervised learning",
+              "Unsupervised learning",
+              "Reinforcement learning",
+              "Manual learning"
+            ],
+            answer: 4
+          },
+          {
+            question: "What is overfitting?",
+            options: [
+              "When a model performs well on training data but poorly on new data",
+              "When a model is too simple",
+              "When a model has too little data",
+              "When a model is trained for too short a time"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which library is commonly used for machine learning in Python?",
+            options: [
+              "scikit-learn",
+              "React",
+              "jQuery",
+              "Bootstrap"
+            ],
+            answer: 1
+          },
+          {
+            question: "What is a neural network?",
+            options: [
+              "A system modeled after the human brain",
+              "A type of database",
+              "A network protocol",
+              "A hardware component"
+            ],
+            answer: 1
+          }
+        ],
+        webdev: [
+          {
+            question: "What does HTML stand for?",
+            options: [
+              "Hyper Text Markup Language",
+              "High Tech Modern Language",
+              "Hyperlinks and Text Markup Language",
+              "Home Tool Markup Language"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which of these is NOT a CSS framework?",
+            options: [
+              "Bootstrap",
+              "Tailwind",
+              "Foundation",
+              "jQuery"
+            ],
+            answer: 4
+          },
+          {
+            question: "What is JavaScript primarily used for?",
+            options: [
+              "Adding interactivity to web pages",
+              "Styling web pages",
+              "Creating database schemas",
+              "Writing server configurations"
+            ],
+            answer: 1
+          },
+          {
+            question: "Which HTTP method is used to retrieve data?",
+            options: [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE"
+            ],
+            answer: 1
+          },
+          {
+            question: "What is responsive web design?",
+            options: [
+              "Designs that adapt to different screen sizes",
+              "Fast-loading websites",
+              "Websites with many interactive elements",
+              "Websites with server-side rendering"
+            ],
+            answer: 1
+          }
+        ]
+      };
+
+      // Current state
+      let currentCourse = 'java';
+      let totalPoints = 1250;
+      let currentLevel = 1;
+      let currentQuizQuestion = 0;
+      let quizScore = 0;
+      let selectedAnswer = null;
+      let quizCompletedForCurrentLesson = false;
+
+      // Initialize the app
+      init();
+
+      function init() {
+        updatePointsDisplay();
+        setupCourseMenu();
+        setupMilestones();
+        setupVideoControls();
+        setupLessonButtons();
+        setupQuiz();
+        updateCompleteButtonState();
+      }
+
+      function updatePointsDisplay() {
+        totalPointsElement.textContent = totalPoints.toLocaleString() + ' XP';
+        
+        // Update level based on points
+        const newLevel = Math.floor(totalPoints / 1000) + 1;
+        if (newLevel !== currentLevel) {
+          currentLevel = newLevel;
+          userAvatar.querySelector('.level-badge').textContent = `Lv.${currentLevel}`;
+          animateLevelUp();
+        }
+      }
+
+      function animateLevelUp() {
+        userAvatar.classList.add('level-up');
+        setTimeout(() => {
+          userAvatar.classList.remove('level-up');
+        }, 1000);
+      }
+
+      function setupCourseMenu() {
+        courseMenuItems.forEach(item => {
+          const courseId = item.dataset.course;
+          const course = courses[courseId];
+          
+          // Update progress bar
+          const progressBar = item.querySelector('.progress');
+          progressBar.style.width = `${course.progress}%`;
+          
+          item.addEventListener('click', function() {
+            // Update active state
+            courseMenuItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update current course
+            currentCourse = courseId;
+            currentLesson = courses[currentCourse].currentLesson;
+            
+            // Update milestones
+            updateMilestones();
+            updateCompleteButtonState();
+          });
+        });
+      }
+
+      function updateMilestones() {
+        const course = courses[currentCourse];
+        
+        milestones.forEach((milestone, index) => {
+          const lessonNumber = index + 1;
+          
+          // Reset classes
+          milestone.classList.remove('completed', 'current', 'locked');
+          milestone.querySelector('.stone').classList.remove('jumping');
+          
+          if (lessonNumber < course.currentLesson) {
+            milestone.classList.add('completed');
+          } else if (lessonNumber === course.currentLesson) {
+            milestone.classList.add('current');
+            milestone.querySelector('.stone').classList.add('jumping');
+          } else {
+            milestone.classList.add('locked');
+          }
+          
+          // Update lesson names
+          const lessonNames = [
+            `${currentCourse.charAt(0).toUpperCase() + currentCourse.slice(1)} Basics`,
+            'Core Concepts',
+            'Advanced Topics',
+            'Practical Applications',
+            'Final Project'
+          ];
+          milestone.querySelector('span').textContent = lessonNames[index] || `Lesson ${lessonNumber}`;
+        });
+      }
+
+      function setupMilestones() {
+        milestones.forEach(milestone => {
+          const lessonNumber = parseInt(milestone.dataset.lesson);
+          
+          milestone.addEventListener('click', function() {
+            if (lessonNumber <= courses[currentCourse].currentLesson) {
+              courses[currentCourse].currentLesson = lessonNumber;
+              updateMilestones();
+              updateCompleteButtonState();
+            }
+          });
+        });
+      }
+
+      function setupVideoControls() {
+        videoControls.forEach(button => {
+          button.addEventListener('click', function() {
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+              ripple.remove();
+            }, 500);
+          });
+        });
+      }
+
+      function updateCompleteButtonState() {
+        const course = courses[currentCourse];
+        const requiresQuiz = course.lessonQuizzes[course.currentLesson - 1];
+        
+        if (requiresQuiz && !quizCompletedForCurrentLesson) {
+          btnComplete.disabled = true;
+          btnComplete.title = "Complete the quiz first to unlock this lesson";
+          btnQuiz.disabled = false;
+        } else {
+          btnComplete.disabled = false;
+          btnComplete.title = "";
+        }
+      }
+
+      function setupLessonButtons() {
+        btnComplete.addEventListener('click', function() {
+          const course = courses[currentCourse];
+          
+          // For final lesson, show course complete modal
+          if (course.currentLesson === course.lessons) {
+            showCourseCompleteModal();
+            return;
+          }
+
+          // Award points
+          const pointsEarned = 50;
+          totalPoints += pointsEarned;
+          
+          // Update course progress
+          course.currentLesson++;
+          course.progress = Math.min(
+            Math.round((course.currentLesson / course.lessons) * 100),
+            100
+          );
+          course.points += pointsEarned;
+          quizCompletedForCurrentLesson = false;
+          
+          // Update UI
+          document.querySelector(`.course-menu li[data-course="${currentCourse}"] .progress`)
+            .style.width = `${course.progress}%`;
+          
+          // Show celebration
+          document.querySelector('.xp-reward').textContent = `+${pointsEarned} XP`;
+          celebrationModal.classList.add('active');
+          updatePointsDisplay();
+          
+          // Move to next lesson after delay
+          setTimeout(() => {
+            updateMilestones();
+            updateCompleteButtonState();
+            celebrationModal.classList.remove('active');
+          }, 2500);
+        });
+        
+        btnQuiz.addEventListener('click', function() {
+          startQuiz();
+        });
+        
+        btnContinue.addEventListener('click', function() {
+          celebrationModal.classList.remove('active');
+        });
+
+        btnBuildProjects.addEventListener('click', function() {
+          courseCompleteModal.classList.remove('active');
+          alert('Redirecting to project builder...');
+        });
+      }
+
+      function showCourseCompleteModal() {
+        const course = courses[currentCourse];
+        // Award bonus points for completing course
+        const bonusPoints = 200;
+        totalPoints += bonusPoints;
+        course.points += bonusPoints;
+        course.progress = 100;
+        
+        // Update UI
+        document.querySelector(`.course-menu li[data-course="${currentCourse}"] .progress`)
+          .style.width = '100%';
+        updatePointsDisplay();
+        
+        // Show course complete modal
+        courseCompleteModal.classList.add('active');
+        
+        // Create fireworks
+        createFireworks();
+      }
+
+      function createFireworks() {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        const container = courseCompleteModal.querySelector('.complete-content');
+        
+        // Clear existing fireworks
+        container.querySelectorAll('.firework').forEach(fw => fw.remove());
+        
+        // Create new fireworks
+        for (let i = 0; i < 10; i++) {
+          setTimeout(() => {
+            const firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.left = `${Math.random() * 80 + 10}%`;
+            firework.style.top = `${Math.random() * 80 + 10}%`;
+            firework.style.color = colors[Math.floor(Math.random() * colors.length)];
+            container.appendChild(firework);
+            
+            setTimeout(() => {
+              firework.remove();
+            }, 2000);
+          }, i * 300);
+        }
+      }
+
+      function setupQuiz() {
+        // Enable submit button when an option is selected
+        quizOptions.forEach(option => {
+          option.addEventListener('change', function() {
+            selectedAnswer = parseInt(this.value);
+            btnQuizSubmit.disabled = false;
+          });
+        });
+
+        // Submit answer
+        btnQuizSubmit.addEventListener('click', function() {
+          const currentQuiz = quizzes[currentCourse][currentQuizQuestion];
+          const isCorrect = selectedAnswer === currentQuiz.answer;
+          
+          if (isCorrect) {
+            quizScore++;
+            quizFeedback.textContent = 'Correct! Well done!';
+            quizFeedback.className = 'quiz-feedback correct';
+          } else {
+            quizFeedback.textContent = `Incorrect. The correct answer is: ${currentQuiz.options[currentQuiz.answer - 1]}`;
+            quizFeedback.className = 'quiz-feedback incorrect';
+          }
+          
+          quizFeedback.style.display = 'block';
+          btnQuizSubmit.style.display = 'none';
+          btnQuizNext.style.display = 'block';
+        });
+
+        // Next question
+        btnQuizNext.addEventListener('click', function() {
+          currentQuizQuestion++;
+          
+          if (currentQuizQuestion < quizzes[currentCourse].length) {
+            loadQuizQuestion();
+          } else {
+            finishQuiz();
+          }
+        });
+      }
+
+      function startQuiz() {
+        currentQuizQuestion = 0;
+        quizScore = 0;
+        selectedAnswer = null;
+        loadQuizQuestion();
+        quizModal.classList.add('active');
+      }
+
+      function loadQuizQuestion() {
+        const currentQuiz = quizzes[currentCourse][currentQuizQuestion];
+        
+        // Update question and options
+        questionTextElement.textContent = currentQuiz.question;
+        currentQuestionElement.textContent = currentQuizQuestion + 1;
+        
+        const optionElements = document.querySelectorAll('.quiz-option span');
+        currentQuiz.options.forEach((option, index) => {
+          optionElements[index].textContent = option;
+        });
+        
+        // Reset UI
+        document.querySelectorAll('.quiz-option input').forEach(input => {
+          input.checked = false;
+        });
+        quizFeedback.style.display = 'none';
+        btnQuizSubmit.disabled = true;
+        btnQuizSubmit.style.display = 'block';
+        btnQuizNext.style.display = 'none';
+      }
+
+      function finishQuiz() {
+        const passingScore = Math.ceil(quizzes[currentCourse].length * 0.7); // 70% to pass
+        const passed = quizScore >= passingScore;
+        
+        quizModal.classList.remove('active');
+        
+        if (passed) {
+          // Mark quiz as passed
+          quizCompletedForCurrentLesson = true;
+          
+          // Award points
+          const quizPoints = 100;
+          totalPoints += quizPoints;
+          courses[currentCourse].points += quizPoints;
+          updatePointsDisplay();
+          
+          // Show success message
+          alert(`Quiz passed! You scored ${quizScore}/${quizzes[currentCourse].length}. You earned ${quizPoints} XP!`);
+          
+          // Enable progression to next lesson
+          updateCompleteButtonState();
+        } else {
+          // Show failure message
+          alert(`Quiz failed. You scored ${quizScore}/${quizzes[currentCourse].length}. Please review the material and try again.`);
+        }
+      }
+
+      // Dynamic confetti
+      setInterval(() => {
+        if (celebrationModal.classList.contains('active')) {
+          const confetti = document.createElement('div');
+          confetti.classList.add('confetti');
+          confetti.style.left = `${Math.random() * 100}%`;
+          confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+          confetti.style.animationDuration = `${2 + Math.random() * 3}s`;
+          confetti.style.animationDelay = `${Math.random() * 2}s`;
+          celebrationModal.querySelector('.celebration-content').appendChild(confetti);
+          
+          setTimeout(() => {
+            confetti.remove();
+          }, 5000);
+        }
+      }, 100);
+    });
+
+    // Add CSS for ripple effect and level up animation
+    const style = document.createElement('style');
+    style.textContent = `
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.7);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+      }
+      
+      @keyframes ripple {
+        to {
+          transform: scale(2.5);
+          opacity: 0;
+        }
+      }
+      
+      .level-up {
+        animation: levelUp 0.5s ease;
+      }
+      
+      @keyframes levelUp {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
